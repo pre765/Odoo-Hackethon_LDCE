@@ -61,18 +61,17 @@
     <main class="page">
       <header>
         <a class="brand" href="/main-landing.html"><span class="plane">✈</span><span>GlobeTrotter<small>travel beyond</small></span></a>
-        <a class="back" href="/new-trip.html">← Trip details</a>
+        <a class="back" href="/itinerary-view.html">← Trip details</a>
       </header>
       <section class="heading">
         <div><p class="eyebrow">CREATE A NEW ADVENTURE</p><h1>Build your itinerary</h1></div>
-        <div class="steps" aria-label="Step 3 of 3"><span></span><span></span><span></span></div>
       </section>
       <section class="planner">
         <div class="planner-top"><div><h2>Your journey, your way</h2><p>Add each part of your adventure below—from travel and stays to memorable activities. You can adjust the dates and budget for every section.</p></div><span class="trip-meta">Swiss Alps · 12–18 Jun</span></div>
         <div class="sections" id="sections">
-          <article class="section-card"><p class="section-number">Section 1</p><h3>Getting there</h3><p>Plan how you will arrive and any travel you want to include.</p><div class="fields"><label class="activity-input">Travel or activity<input placeholder="e.g. Flight to Zurich" /></label><label>Date range<input type="text" placeholder="12 Jun – 13 Jun" /></label><label>Budget<input type="number" min="0" placeholder="$ 350" /></label></div></article>
-          <article class="section-card"><p class="section-number">Section 2</p><h3>Stay & explore</h3><p>Add your hotel, local experiences, or anything else you would like to do.</p><div class="fields"><label class="activity-input">Travel or activity<input placeholder="e.g. Mountain hotel & village walk" /></label><label>Date range<input type="text" placeholder="13 Jun – 16 Jun" /></label><label>Budget<input type="number" min="0" placeholder="$ 720" /></label></div></article>
-          <article class="section-card"><p class="section-number">Section 3</p><h3>Final adventure</h3><p>Leave room for one more experience before you make your way home.</p><div class="fields"><label class="activity-input">Travel or activity<input placeholder="e.g. Cable car & lakeside lunch" /></label><label>Date range<input type="text" placeholder="16 Jun – 18 Jun" /></label><label>Budget<input type="number" min="0" placeholder="$ 280" /></label></div></article>
+          <article class="section-card"><p class="section-number">Section 1</p><h3>Getting there</h3><p>Plan how you will arrive and any travel you want to include.</p><div class="fields"><label class="activity-input">Travel or activity<input placeholder="e.g. Flight to Zurich" /></label><label>Date<input type="text" placeholder="12 Jun – 13 Jun" /></label><label>Budget<input type="number" min="0" placeholder="$ 350" /></label></div></article>
+          <article class="section-card"><p class="section-number">Section 2</p><h3>Stay & explore</h3><p>Add your hotel, local experiences, or anything else you would like to do.</p><div class="fields"><label class="activity-input">Travel or activity<input placeholder="e.g. Mountain hotel & village walk" /></label><label>Date<input type="text" placeholder="13 Jun – 16 Jun" /></label><label>Budget<input type="number" min="0" placeholder="$ 720" /></label></div></article>
+          <article class="section-card"><p class="section-number">Section 3</p><h3>Final adventure</h3><p>Leave room for one more experience before you make your way home.</p><div class="fields"><label class="activity-input">Travel or activity<input placeholder="e.g. Cable car & lakeside lunch" /></label><label>Date<input type="text" placeholder="16 Jun – 18 Jun" /></label><label>Budget<input type="number" min="0" placeholder="$ 280" /></label></div></article>
         </div>
         <button class="add" id="add-section" type="button"><b>＋</b> Add another section</button>
         <div class="actions"><button class="save" type="button" id="save">Save for later</button><button class="finish" type="button" id="finish">Finish itinerary →</button></div>
@@ -92,7 +91,24 @@
       });
       sections.addEventListener('click', event => { if (event.target.classList.contains('remove')) { event.target.closest('.section-card').remove(); updateNumbers(); } });
       document.getElementById('save').addEventListener('click', () => showToast('Your itinerary has been saved.'));
-      document.getElementById('finish').addEventListener('click', () => showToast('Your itinerary is ready for the next adventure!'));
+      document.getElementById('finish').addEventListener('click', () => { const trip=JSON.parse(localStorage.getItem('globetrotter-active-trip')||'{}'); trip.sections=[...document.querySelectorAll('.section-card')].map((card,index)=>{const inputs=card.querySelectorAll('input');return {title:inputs[0].value||card.querySelector('h3').textContent,dates:inputs[1].value,cost:Number(inputs[2].value)||0,order:index+1}}); trip.completedAt=new Date().toISOString(); localStorage.setItem('globetrotter-latest-trip',JSON.stringify(trip)); window.location.href='itinerary-view.html'; });
+    </script>
+    <script>
+      (() => {
+        const sections = document.getElementById('sections');
+        const setupCard = card => {
+          card.draggable = true;
+          card.title = 'Drag to reorder this section';
+          const dateInput = card.querySelector('label:nth-child(2) input');
+          if (dateInput) { dateInput.type = 'date'; dateInput.removeAttribute('placeholder'); }
+        };
+        [...sections.children].forEach(setupCard);
+        let dragging;
+        sections.addEventListener('dragstart', event => { dragging = event.target.closest('.section-card'); if (dragging) dragging.style.opacity = '.45'; });
+        sections.addEventListener('dragend', () => { if (dragging) dragging.style.opacity = ''; dragging = null; updateNumbers(); });
+        sections.addEventListener('dragover', event => { event.preventDefault(); const target = event.target.closest('.section-card'); if (dragging && target && target !== dragging) { const before = event.clientY < target.getBoundingClientRect().top + target.offsetHeight / 2; sections.insertBefore(dragging, before ? target : target.nextSibling); } });
+        document.getElementById('add-section').addEventListener('click', () => setTimeout(() => setupCard(sections.lastElementChild), 0));
+      })();
     </script>
   </body>
 </html>

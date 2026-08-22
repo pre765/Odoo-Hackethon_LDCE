@@ -75,5 +75,15 @@
     </script>
     <script>document.querySelector('.itinerary').insertAdjacentHTML('beforebegin','<section class="build-section"><div><b>Ready to shape your journey?</b><p>Add, update, or organise activities and budgets in your personal itinerary.</p></div><a class="build-button" href="build-itinerary.html">Build itinerary →</a></section>');</script>
     <script>document.querySelector('.profile').addEventListener('click', () => { window.location.href = 'main-landing.html'; });</script>
+    <script>(()=>{const trip=JSON.parse(localStorage.getItem('globetrotter-latest-trip')||'null');if(!trip)return;document.querySelector('.intro .eyebrow').textContent=`${trip.destination||'YOUR TRIP'} · ${trip.start||''} – ${trip.end||''}`;document.querySelector('.intro h1').textContent=trip.destination||'My planned trip';document.querySelector('.intro p:last-child').textContent=`${trip.travelers||'Your'} journey, planned your way.`;const itinerary=document.querySelector('.itinerary');itinerary.querySelectorAll('.day').forEach(day=>day.remove());const budget=trip.sections.reduce((sum,section)=>sum+section.cost,0);trip.sections.forEach((section,index)=>{const day=document.createElement('section');day.className='day';day.innerHTML=`<div><span class="day-tag">Day ${index+1}</span><small class="day-date">${section.dates||'Dates to be decided'}</small></div><div class="entries"><div class="entry"><article class="activity" data-name="${section.title}"><span class="activity-icon">✦</span><div><b>${section.title}</b><small>${section.dates||'Add dates when ready'}</small></div></article><div class="expense">$${section.cost}<small>Planned</small></div></div></div>`;itinerary.insertBefore(day,itinerary.querySelector('.budget'))});itinerary.querySelector('.budget').innerHTML=`<p><b>Trip budget</b><span>$${budget} planned</span></p><p><b>${trip.sections.length} sections</b>Your completed itinerary</p>`})();</script>
+    <script>
+      (() => {
+        const button = document.createElement('button');
+        button.type = 'button'; button.textContent = 'Save this planning';
+        button.style.cssText = 'display:block;margin:24px 0 0 auto;padding:12px 18px;border:1px solid #173c35;border-radius:7px;background:#173c35;color:#fff;font:700 12px "DM Sans",sans-serif;box-shadow:0 3px 0 #cbd8d0;cursor:pointer';
+        button.addEventListener('click', () => { window.location.href = 'profile-preview.html'; });
+        document.querySelector('.itinerary').append(button);
+      })();
+    </script>
   </body>
 </html>
