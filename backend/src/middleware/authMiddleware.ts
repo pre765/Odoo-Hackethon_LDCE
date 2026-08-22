@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import jwt, { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 export interface AuthenticatedRequest extends Request {
   userId?: number;
@@ -31,14 +31,21 @@ export function createAuthToken(userId: number) {
   );
 }
 
-export function requireAuth(request: AuthenticatedRequest, response: Response, next: NextFunction) {
+export function requireAuth(
+  request: AuthenticatedRequest,
+  response: Response,
+  next: NextFunction,
+) {
   const authorization = request.header("authorization");
+
   const token = authorization?.startsWith("Bearer ")
     ? authorization.slice("Bearer ".length).trim()
     : undefined;
 
   if (!token) {
-    return response.status(401).json({ error: "Authentication is required." });
+    return response.status(401).json({
+      error: "Authentication is required.",
+    });
   }
 
   try {
@@ -46,20 +53,34 @@ export function requireAuth(request: AuthenticatedRequest, response: Response, n
       issuer: "globetrotter-api",
       audience: "globetrotter-web",
     }) as AuthTokenPayload;
+
     const userId = Number(payload.sub);
 
-    if (payload.type !== "access" || !Number.isSafeInteger(userId) || userId < 1) {
-      return response.status(401).json({ error: "Your session is invalid. Please sign in again." });
+    if (
+      payload.type !== "access" ||
+      !Number.isSafeInteger(userId) ||
+      userId < 1
+    ) {
+      return response.status(401).json({
+        error: "Your session is invalid. Please sign in again.",
+      });
     }
 
     request.userId = userId;
+
     return next();
   } catch (error) {
-    const message = error instanceof TokenExpiredError
-      ? "Your session has expired. Please sign in again."
-      : error instanceof JsonWebTokenError
-        ? "Your session is invalid. Please sign in again."
-        : "Authentication could not be verified.";
-    return response.status(401).json({ error: message });
+    const errorName = error instanceof Error ? error.name : "";
+
+    const message =
+      errorName === "TokenExpiredError"
+        ? "Your session has expired. Please sign in again."
+        : errorName === "JsonWebTokenError"
+          ? "Your session is invalid. Please sign in again."
+          : "Authentication could not be verified.";
+
+    return response.status(401).json({
+      error: message,
+    });
   }
 }
