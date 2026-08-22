@@ -486,6 +486,8 @@ footer {
   z-index: 5;
   right: 22px;
   bottom: 88px;
+  display: grid;
+  place-items: center;
   background: #fff;
   color: #173c35;
   width: 47px;
@@ -494,11 +496,7 @@ footer {
   box-shadow: 0 5px 18px #1b312529;
 }
 .chat:after {
-  content: "";
-  position: absolute;
-  inset: -4px 4px 5px -3px;
-  border: 2px solid #173c35;
-  border-radius: 50%;
+  content: none;
 }
 .plan-trip {
   position: fixed;
