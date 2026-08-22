@@ -22,6 +22,8 @@
     .grid{perspective:1200px}.place{cursor:pointer;transform:translateZ(0);will-change:transform;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform .45s cubic-bezier(.2,.75,.25,1),filter .45s ease,box-shadow .45s ease;background-size:100%}.place:hover{box-shadow:0 24px 42px rgba(0,0,0,.27);filter:brightness(1.07)}.place div{transition:transform .45s cubic-bezier(.2,.75,.25,1)}.place:hover div{transform:translateY(-7px)}.place::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(120deg,rgba(255,255,255,.15),transparent 33%);opacity:0;transition:opacity .4s}.place:hover::before{opacity:1}.place.is-tilting{transition:box-shadow .25s ease,filter .25s ease}.final{width:100%;min-height:min(680px,100vh);padding:80px 0;box-sizing:border-box}.final .shell{width:min(1240px,calc(100% - 64px));margin-inline:auto}.final .actions{margin-top:34px}.final .ghost{transition:color .2s,border-color .2s}.final .ghost:hover{color:var(--lime);border-color:var(--lime)}
     @media(max-width:760px){.final{min-height:560px;padding:70px 0}.final .shell{width:calc(100% - 40px)}.place{transform:none!important}.place:hover{box-shadow:none;filter:none}.place:hover div{transform:none}}
     .place:first-child { background-image: url('assets/patagonia-mountain-lake.png') !important; background-position: center; }
+    /* Visible hero authentication actions */
+    .hero .signin{display:inline-flex;align-items:center;justify-content:center;padding:11px 17px;border:1px solid rgba(255,255,255,.72);border-radius:999px;background:rgba(10,44,40,.22);backdrop-filter:blur(8px);color:#fff;font-size:11px;font-weight:700;transition:transform .2s,background .2s}.hero .signin:hover{background:rgba(255,255,255,.18);transform:translateY(-2px)}.hero .nav>.cta{display:none}@media(max-width:760px){.hero .signin{display:inline-flex}.hero .menu{display:none}.nav{gap:7px}.hero .logo{margin-right:auto}}
   </style>
 </head>
 <body>
@@ -53,4 +55,5 @@
       card.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); card.click(); } });
     });
   </script>
+  <script>document.querySelector('.nav > .signin').textContent = 'Login / Sign up';</script>
 </body></html>
