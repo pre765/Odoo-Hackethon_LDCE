@@ -274,9 +274,9 @@ function App() {
       <button className="chat" aria-label="Chat with us">
         <CircleUserRound />
       </button>
-      <button className="plan-trip" onClick={() => setSearched(true)}>
+      <a className="plan-trip" href="/new-trip.html">
         +&nbsp; Plan a trip
-      </button>
+      </a>
     </main>
   );
 }
