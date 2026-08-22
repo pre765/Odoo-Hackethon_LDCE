@@ -229,6 +229,19 @@ h2 {
 .filter-button + .filter-button {
   margin-left: 4px;
 }
+.filter-select {
+  cursor: pointer;
+  min-width: 88px;
+}
+.view-all {
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: inherit;
+  background: transparent;
+  padding: 0;
+}
 .booking-item {
   flex: 1;
   display: flex;
@@ -325,6 +338,32 @@ h2 {
   grid-template-columns: repeat(4, 1fr);
   gap: 14px;
 }
+.destination-status {
+  grid-column: 1 / -1;
+  min-height: 215px;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  text-align: center;
+  border: 1px solid #e2e7e3;
+  border-radius: 8px;
+  color: #60756f;
+  font-size: 11px;
+  background: #fbfcfa;
+}
+.destination-status p {
+  margin: 0;
+}
+.status-action {
+  justify-self: center;
+  border: 1px solid #31564d;
+  border-radius: 6px;
+  padding: 6px 11px;
+  color: #173c35;
+  background: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
 .place-card {
   height: 215px;
   border-radius: 8px;
@@ -337,6 +376,11 @@ h2 {
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
+  cursor: pointer;
+}
+.place-card:focus-visible {
+  outline: 3px solid #c2934d;
+  outline-offset: 3px;
 }
 .badge {
   align-self: flex-start;
@@ -512,6 +556,60 @@ footer {
   font-size: 11px;
   font-weight: 700;
 }
+.modal-backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(9, 29, 25, 0.48);
+}
+.modal {
+  position: relative;
+  width: min(100%, 410px);
+  padding: 30px;
+  border-radius: 10px;
+  background: #fefefb;
+  color: #173c35;
+  box-shadow: 0 16px 42px rgba(8, 28, 24, 0.3);
+}
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #173c35;
+  background: #eef2ef;
+}
+.modal-title {
+  margin: 0 0 8px;
+  font: 600 28px/1 "Playfair Display", serif;
+}
+.modal-location,
+.modal-rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #61746f;
+  font-size: 11px;
+}
+.modal > p:not(.eyebrow):not(.modal-title):not(.modal-location):not(.modal-rating) {
+  font-size: 12px;
+  line-height: 1.55;
+  color: #526863;
+}
+.modal-rating {
+  color: #b68644;
+  font-weight: 700;
+}
+.modal-contact-link {
+  margin-top: 8px;
+}
 @media (max-width: 720px) {
   .shell {
     width: min(100% - 32px, 550px);
@@ -554,6 +652,9 @@ footer {
   .filter-button {
     flex: 1;
     justify-content: center;
+  }
+  .filter-select {
+    min-width: 0;
   }
   .booking-item {
     min-width: calc(50% - 6px);
