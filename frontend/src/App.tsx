@@ -11,6 +11,21 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import CalendarView from "./pages/CalendarView";
+import ActivitySearch from "./pages/ActivitySearch";
+import AdminPanel from "./pages/AdminPanel";
+import Budget from "./pages/Budget";
+import Community from "./pages/Community";
+import CityDetails from "./pages/CityDetails";
+import CitySearch from "./pages/CitySearch";
+import CreateTrip from "./pages/CreateTrip";
+import Dashboard from "./pages/Dashboard";
+import ItineraryBuilder from "./pages/ItineraryBuilder";
+import ItineraryView from "./pages/ItineraryView";
+import Login from "./pages/Login";
+import MyTrips from "./pages/MyTrips";
+import Profile from "./pages/Profile";
+import SharedTrip from "./pages/SharedTrip";
+import Signup from "./pages/Signup";
 import { getDestinations } from "./services/cityApi";
 import type {
   Destination,
@@ -48,7 +63,7 @@ function destinationImage(destination: Destination) {
 }
 
 function App() {
-  const [isCalendarPage, setIsCalendarPage] = useState(() => window.location.hash === "#calendar");
+  const [currentHash, setCurrentHash] = useState(() => window.location.hash || "#top");
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [groupBy, setGroupBy] = useState<DestinationGroup>("none");
@@ -68,13 +83,16 @@ function App() {
   const resultLimit = hasActiveQuery ? 48 : 4;
 
   useEffect(() => {
-    function syncPageWithHash() {
-      setIsCalendarPage(window.location.hash === "#calendar");
-    }
+    function syncPageWithHash() { setCurrentHash(window.location.hash || "#top"); }
 
     window.addEventListener("hashchange", syncPageWithHash);
     return () => window.removeEventListener("hashchange", syncPageWithHash);
   }, []);
+
+  const isCalendarPage = currentHash === "#calendar";
+  const route = currentHash.replace(/^#/, "").split("?")[0];
+  const tripMatch = route.match(/^trips\/(\d+)(?:\/(edit))?$/);
+  const cityMatch = route.match(/^cities\/(\d+)$/);
 
   useEffect(() => {
     if (isCalendarPage) return;
@@ -129,6 +147,25 @@ function App() {
     setShowAll(true);
     scrollToDestinations();
   }
+
+  if (route === "login") return <Login onSwitch={() => { window.location.hash = "#signup"; }} />;
+  if (route === "signup") return <Signup onSwitch={() => { window.location.hash = "#login"; }} />;
+  if (route === "dashboard") return <Dashboard />;
+  if (route === "trips") return <MyTrips />;
+  if (route === "trips/new") return <CreateTrip />;
+  if (route === "new-trip") return <CreateTrip />;
+  if (tripMatch) return tripMatch[2] ? <ItineraryBuilder tripId={Number(tripMatch[1])} /> : <ItineraryView tripId={Number(tripMatch[1])} />;
+  if (route === "cities") return <CitySearch />;
+  if (cityMatch) return <CityDetails cityId={cityMatch[1]} />;
+  if (route === "activities") return <ActivitySearch />;
+  if (route === "budget") return <Budget />;
+  if (route === "profile") return <Profile />;
+  if (route === "profile-preview") return <Profile />;
+  if (route === "trip-listing") return <MyTrips />;
+  if (route === "auth-preview") return <Login onSwitch={() => { window.location.hash = "#signup"; }} />;
+  if (route === "community") return <Community />;
+  if (route === "admin") return <AdminPanel />;
+  if (route.startsWith("shared/")) return <SharedTrip slug={route.slice("shared/".length)} />;
 
   if (isCalendarPage) {
     return <CalendarView />;
@@ -419,7 +456,7 @@ function App() {
       >
         <CircleUserRound />
       </button>
-      <a className="plan-trip" href="/new-trip.html">
+      <a className="plan-trip" href="#trips/new">
         +&nbsp; Plan a trip
       </a>
 

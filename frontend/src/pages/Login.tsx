@@ -14,7 +14,7 @@ export default function Login({ onSwitch }: LoginProps) {
         email: String(form.get("email") ?? ""),
         password: String(form.get("password") ?? ""),
       });
-      window.location.hash = "#top";
+      window.location.hash = "#dashboard";
     } catch (error) {
       window.alert(error instanceof Error ? error.message : "Unable to log in.");
     }

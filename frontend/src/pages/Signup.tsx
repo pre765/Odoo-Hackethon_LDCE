@@ -14,7 +14,7 @@ export default function Signup({ onSwitch }: SignupProps) {
         email: String(form.get("email") ?? ""),
         password: String(form.get("password") ?? ""),
       });
-      window.location.hash = "#top";
+      window.location.hash = "#dashboard";
     } catch (error) {
       window.alert(error instanceof Error ? error.message : "Unable to create your account.");
     }
