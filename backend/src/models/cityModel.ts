@@ -42,7 +42,7 @@ const destinationFields = `
   description,
   image_url,
   rating,
-  popularity_score
+  popularity AS popularity_score
 `;
 
 function toDestination(row: DestinationRow): Destination {
@@ -69,8 +69,8 @@ function orderBy(sort: DestinationSort, groupBy?: DestinationGroup) {
 
   const sortOrder = {
     popular:
-      "COALESCE(popularity_score, 0) DESC, COALESCE(rating, 0) DESC, name ASC",
-    rating: "COALESCE(rating, 0) DESC, COALESCE(popularity_score, 0) DESC, name ASC",
+      "COALESCE(popularity, 0) DESC, COALESCE(rating, 0) DESC, name ASC",
+    rating: "COALESCE(rating, 0) DESC, COALESCE(popularity, 0) DESC, name ASC",
     name: "name ASC",
   }[sort];
 
@@ -93,7 +93,7 @@ export async function findDestinations(options: DestinationQuery) {
   }
 
   if (options.filter === "popular") {
-    conditions.push("COALESCE(popularity_score, 0) > 0");
+    conditions.push("COALESCE(popularity, 0) > 0");
   }
 
   if (options.filter === "highly-rated") {

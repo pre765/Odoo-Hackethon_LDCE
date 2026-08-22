@@ -14,9 +14,9 @@ function dateInCurrentMonth(day: number) {
  */
 export const mockTrips: Trip[] = [
   {
-    id: "paris-trip",
+    id: 1,
     name: "Paris Trip",
-    destination: "Paris, France",
+    destinations: ["Paris, France"],
     startDate: dateInCurrentMonth(4),
     endDate: dateInCurrentMonth(7),
     stops: ["Le Marais", "Montmartre", "Saint-Germain-des-Prés"],
@@ -24,9 +24,9 @@ export const mockTrips: Trip[] = [
     accent: "gold",
   },
   {
-    id: "japan-adventure",
+    id: 2,
     name: "Japan Adventure",
-    destination: "Tokyo & Kyoto, Japan",
+    destinations: ["Tokyo & Kyoto, Japan"],
     startDate: dateInCurrentMonth(15),
     endDate: dateInCurrentMonth(19),
     stops: ["Tokyo", "Hakone", "Kyoto"],
@@ -34,9 +34,9 @@ export const mockTrips: Trip[] = [
     accent: "terracotta",
   },
   {
-    id: "nyc-getaway",
+    id: 3,
     name: "NYC Getaway",
-    destination: "New York City, USA",
+    destinations: ["New York City, USA"],
     startDate: dateInCurrentMonth(23),
     endDate: dateInCurrentMonth(26),
     stops: ["SoHo", "Central Park", "Brooklyn"],
@@ -44,9 +44,9 @@ export const mockTrips: Trip[] = [
     accent: "ocean",
   },
   {
-    id: "coastal-escape",
+    id: 4,
     name: "Coastal Escape",
-    destination: "Amalfi Coast, Italy",
+    destinations: ["Amalfi Coast, Italy"],
     startDate: dateInCurrentMonth(28),
     endDate: dateInCurrentMonth(30),
     stops: ["Positano", "Ravello", "Amalfi"],

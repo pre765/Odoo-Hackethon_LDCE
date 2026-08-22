@@ -8,6 +8,7 @@ import {
   getDestinationDetails,
   getDestinationList,
 } from "../services/cityService.js";
+import { getRecommendedDestinations } from "../services/recommendationService.js";
 
 const validFilters = new Set<DestinationFilter>(["all", "popular", "highly-rated"]);
 const validSorts = new Set<DestinationSort>(["popular", "rating", "name"]);
@@ -71,4 +72,12 @@ export async function getCityById(request: Request, response: Response) {
   }
 
   return response.json({ data: city });
+}
+
+export async function getRecommendedCities(request: Request, response: Response) {
+  const requestedLimit = Number(firstQueryValue(request.query.limit) ?? 8);
+  if (!Number.isInteger(requestedLimit) || requestedLimit < 1 || requestedLimit > 50) {
+    return response.status(400).json({ error: "limit must be an integer from 1 to 50." });
+  }
+  return response.json({ data: await getRecommendedDestinations(requestedLimit) });
 }

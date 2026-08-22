@@ -13,11 +13,24 @@ CREATE TABLE users (
     country       VARCHAR(80),
     photo_url     TEXT,
     language_pref VARCHAR(10)  DEFAULT 'en',
+    preferences   JSONB        NOT NULL DEFAULT '{}'::jsonb,
     is_admin      BOOLEAN      NOT NULL DEFAULT FALSE,
-    created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+    created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_users_email ON users(email);
+
+CREATE TABLE password_reset_tokens (
+    id          SERIAL PRIMARY KEY,
+    user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash  CHAR(64) NOT NULL UNIQUE,
+    expires_at  TIMESTAMPTZ NOT NULL,
+    used_at     TIMESTAMPTZ,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_password_reset_tokens_user ON password_reset_tokens(user_id);
 
 -- ============ MASTER DATA ============
 CREATE TABLE cities (
@@ -27,6 +40,7 @@ CREATE TABLE cities (
     region       VARCHAR(120),
     cost_index   NUMERIC(5,2),
     popularity   INTEGER DEFAULT 0,
+    rating       NUMERIC(2,1),
     latitude     NUMERIC(9,6),
     longitude    NUMERIC(9,6),
     image_url    TEXT,

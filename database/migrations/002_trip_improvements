@@ -1,0 +1,20 @@
+-- Allow the dashboard/trip flow to store number of travelers.
+ALTER TABLE trips
+ADD COLUMN IF NOT EXISTS travelers INTEGER NOT NULL DEFAULT 1;
+
+ALTER TABLE trips
+DROP CONSTRAINT IF EXISTS chk_trip_travelers;
+
+ALTER TABLE trips
+ADD CONSTRAINT chk_trip_travelers
+CHECK (travelers >= 1);
+
+-- Helpful indexes for calendar and itinerary queries.
+CREATE INDEX IF NOT EXISTS idx_trips_dates
+ON trips(start_date, end_date);
+
+CREATE INDEX IF NOT EXISTS idx_itinerary_items_stop_date
+ON itinerary_items(trip_stop_id, scheduled_date);
+
+CREATE INDEX IF NOT EXISTS idx_trip_stops_city
+ON trip_stops(city_id);

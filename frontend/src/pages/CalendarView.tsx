@@ -9,8 +9,8 @@ import {
   Search,
   X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
-import { mockTrips } from "../data/mockTrips";
+import { useEffect, useMemo, useState } from "react";
+import { getTrips } from "../services/tripApi";
 import type { Trip } from "../types";
 import "./CalendarView.css";
 
@@ -18,6 +18,7 @@ type CalendarMode = "calendar" | "timeline";
 type TripFilter = "all" | "upcoming" | "completed";
 type TripGroup = "none" | "destination";
 type TripSort = "start" | "name" | "duration";
+type CalendarTrip = Trip & { destination: string };
 
 const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -48,11 +49,11 @@ function getMonthWeeks(month: Date) {
   );
 }
 
-function numberOfDays(trip: Trip) {
+function numberOfDays(trip: CalendarTrip) {
   return Math.round((parseDate(trip.endDate).getTime() - parseDate(trip.startDate).getTime()) / 86_400_000) + 1;
 }
 
-function getTripSegments(trips: Trip[], week: Date[]) {
+function getTripSegments(trips: CalendarTrip[], week: Date[]) {
   const weekStart = toDateKey(week[0]);
   const weekEnd = toDateKey(week[6]);
   const occupiedRows: boolean[][] = [];
@@ -79,7 +80,7 @@ function getTripSegments(trips: Trip[], week: Date[]) {
     });
 }
 
-function formatTripDates(trip: Trip) {
+function formatTripDates(trip: CalendarTrip) {
   const start = parseDate(trip.startDate);
   const end = parseDate(trip.endDate);
   const monthFormat = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" });
@@ -98,8 +99,11 @@ function CalendarView() {
   const [filter, setFilter] = useState<TripFilter>("all");
   const [sortBy, setSortBy] = useState<TripSort>("start");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
+  const [selectedTrip, setSelectedTrip] = useState<CalendarTrip | null>(null);
   const [contactOpen, setContactOpen] = useState(false);
+  const [tripData, setTripData] = useState<Trip[]>([]);
+  const [isLoadingTrips, setIsLoadingTrips] = useState(true);
+  const [tripError, setTripError] = useState<string | null>(null);
 
   const todayKey = toDateKey(new Date());
   const weeks = useMemo(() => getMonthWeeks(month), [month]);
@@ -108,9 +112,34 @@ function CalendarView() {
     year: "numeric",
   }).format(month);
 
+  useEffect(() => {
+    const controller = new AbortController();
+    setIsLoadingTrips(true);
+    setTripError(null);
+
+    void getTrips()
+      .then((data) => {
+        if (!controller.signal.aborted) setTripData(data);
+      })
+      .catch((error: unknown) => {
+        if (!controller.signal.aborted) {
+          setTripError(error instanceof Error ? error.message : "Unable to load your trips.");
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setIsLoadingTrips(false);
+      });
+
+    return () => controller.abort();
+  }, []);
+
   const trips = useMemo(() => {
+    const calendarTrips: CalendarTrip[] = tripData.map((trip) => ({
+      ...trip,
+      destination: trip.destinations.join(" · ") || "Your adventure",
+    }));
     const normalizedSearch = searchTerm.trim().toLowerCase();
-    const filteredTrips = mockTrips.filter((trip) => {
+    const filteredTrips = calendarTrips.filter((trip) => {
       const matchesSearch =
         !normalizedSearch ||
         [trip.name, trip.destination, ...(trip.stops ?? [])]
@@ -132,7 +161,7 @@ function CalendarView() {
       }
       return firstTrip.startDate.localeCompare(secondTrip.startDate);
     });
-  }, [filter, groupBy, searchTerm, sortBy, todayKey]);
+  }, [filter, groupBy, searchTerm, sortBy, todayKey, tripData]);
 
   const tripsInSelectedMonth = trips.filter((trip) => {
     const firstMonthDay = toDateKey(month);
@@ -149,7 +178,7 @@ function CalendarView() {
     setMonth(new Date(today.getFullYear(), today.getMonth(), 1));
   }
 
-  const groupedTimelineTrips = tripsInSelectedMonth.reduce<Record<string, Trip[]>>((groups, trip) => {
+  const groupedTimelineTrips = tripsInSelectedMonth.reduce<Record<string, CalendarTrip[]>>((groups, trip) => {
     const groupName = groupBy === "destination" ? trip.destination : "Your trips";
     (groups[groupName] ??= []).push(trip);
     return groups;
@@ -314,8 +343,12 @@ function CalendarView() {
                 );
               })}
             </div>
-            {tripsInSelectedMonth.length === 0 && (
-              <div className="calendar-empty">No trips match these controls for {selectedMonthLabel}.</div>
+            {(isLoadingTrips || tripError || tripsInSelectedMonth.length === 0) && (
+              <div className="calendar-empty">
+                {isLoadingTrips
+                  ? "Loading your trips..."
+                  : tripError ?? `No trips match these controls for ${selectedMonthLabel}.`}
+              </div>
             )}
           </div>
         ) : (
@@ -336,8 +369,12 @@ function CalendarView() {
                 ))}
               </section>
             ))}
-            {tripsInSelectedMonth.length === 0 && (
-              <div className="timeline-empty">No trips match these controls for {selectedMonthLabel}.</div>
+            {(isLoadingTrips || tripError || tripsInSelectedMonth.length === 0) && (
+              <div className="timeline-empty">
+                {isLoadingTrips
+                  ? "Loading your trips..."
+                  : tripError ?? `No trips match these controls for ${selectedMonthLabel}.`}
+              </div>
             )}
           </div>
         )}

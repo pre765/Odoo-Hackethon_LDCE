@@ -1,6 +1,5 @@
 import type { Destination, DestinationQuery } from "../types";
-
-const apiBaseUrl = (import.meta.env.VITE_API_URL ?? "http://localhost:4000/api").replace(/\/$/, "");
+import { apiRequest } from "./apiClient";
 
 interface DestinationListResponse {
   data: Destination[];
@@ -8,19 +7,6 @@ interface DestinationListResponse {
 
 interface DestinationResponse {
   data: Destination;
-}
-
-interface ApiErrorBody {
-  error?: string;
-}
-
-async function readResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    const body = (await response.json().catch(() => ({}))) as ApiErrorBody;
-    throw new Error(body.error ?? "Unable to load destinations. Please try again.");
-  }
-
-  return response.json() as Promise<T>;
 }
 
 export async function getDestinations(
@@ -37,11 +23,13 @@ export async function getDestinations(
   if (query.all) params.set("all", "true");
 
   const suffix = params.size ? `?${params.toString()}` : "";
-  const response = await fetch(`${apiBaseUrl}/cities${suffix}`, { signal });
-  return (await readResponse<DestinationListResponse>(response)).data;
+  return (await apiRequest<DestinationListResponse>(`/cities${suffix}`, { signal })).data;
 }
 
 export async function getDestination(id: string, signal?: AbortSignal) {
-  const response = await fetch(`${apiBaseUrl}/cities/${encodeURIComponent(id)}`, { signal });
-  return (await readResponse<DestinationResponse>(response)).data;
+  return (await apiRequest<DestinationResponse>(`/cities/${encodeURIComponent(id)}`, { signal })).data;
+}
+
+export async function getRecommendedDestinations(limit = 8, signal?: AbortSignal) {
+  return (await apiRequest<DestinationListResponse>(`/cities/recommended?limit=${limit}`, { signal })).data;
 }

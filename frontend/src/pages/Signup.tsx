@@ -1,9 +1,24 @@
 import { FormEvent } from 'react';
+import { signup } from "../services/authApi";
 
 type SignupProps = { onSwitch: () => void };
 
 export default function Signup({ onSwitch }: SignupProps) {
-  const submit = (event: FormEvent) => event.preventDefault();
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    try {
+      await signup({
+        firstName: String(form.get("firstName") ?? ""),
+        lastName: String(form.get("lastName") ?? ""),
+        email: String(form.get("email") ?? ""),
+        password: String(form.get("password") ?? ""),
+      });
+      window.location.hash = "#top";
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : "Unable to create your account.");
+    }
+  };
 
   return (
     <main className="auth-page signup-page">
@@ -25,9 +40,9 @@ export default function Signup({ onSwitch }: SignupProps) {
           <button className="google-button" type="button"><span className="google-icon">G</span>Sign up with Google</button>
           <div className="divider"><span>or sign up with email</span></div>
           <form onSubmit={submit}>
-            <div className="name-row"><label>First name<input type="text" placeholder="Avery" required /></label><label>Last name<input type="text" placeholder="Stone" required /></label></div>
-            <label>Email address<input type="email" placeholder="you@example.com" required /></label>
-            <label>Password<input type="password" placeholder="At least 8 characters" minLength={8} required /></label>
+            <div className="name-row"><label>First name<input name="firstName" type="text" placeholder="Avery" required /></label><label>Last name<input name="lastName" type="text" placeholder="Stone" /></label></div>
+            <label>Email address<input name="email" type="email" placeholder="you@example.com" required /></label>
+            <label>Password<input name="password" type="password" placeholder="At least 8 characters" minLength={8} required /></label>
             <label className="terms"><input type="checkbox" required /><span>I agree to the <a href="#terms">Terms of Service</a> and <a href="#privacy">Privacy Policy</a>.</span></label>
             <button className="primary-button" type="submit">Create account <span>→</span></button>
           </form>

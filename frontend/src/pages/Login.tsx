@@ -1,12 +1,23 @@
 import { FormEvent } from 'react';
+import { login } from "../services/authApi";
 
 type LoginProps = { onSwitch: () => void };
 
 const GoogleIcon = () => <span className="google-icon" aria-hidden="true">G</span>;
 
 export default function Login({ onSwitch }: LoginProps) {
-  const submit = (event: FormEvent) => {
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    try {
+      await login({
+        email: String(form.get("email") ?? ""),
+        password: String(form.get("password") ?? ""),
+      });
+      window.location.hash = "#top";
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : "Unable to log in.");
+    }
   };
 
   return (
@@ -29,8 +40,8 @@ export default function Login({ onSwitch }: LoginProps) {
           <button className="google-button" type="button"><GoogleIcon />Continue with Google</button>
           <div className="divider"><span>or continue with email</span></div>
           <form onSubmit={submit}>
-            <label>Email address<input type="email" placeholder="you@example.com" required /></label>
-            <label>Password<span className="label-action">Forgot password?</span><input type="password" placeholder="Enter your password" required /></label>
+            <label>Email address<input name="email" type="email" placeholder="you@example.com" required /></label>
+            <label>Password<span className="label-action">Forgot password?</span><input name="password" type="password" placeholder="Enter your password" required /></label>
             <button className="primary-button" type="submit">Log in <span>→</span></button>
           </form>
           <p className="switch-copy">New to GlobeTrotter? <button onClick={onSwitch} type="button">Create an account</button></p>
