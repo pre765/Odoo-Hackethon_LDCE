@@ -108,36 +108,16 @@ function App() {
       </section>
 
       <section className="booking shell" aria-label="Travel search">
-        <div className="booking-item">
-          <MapPin />
-          <span>
-            <b>Where to?</b>
-            <small>Search destinations</small>
-          </span>
-        </div>
-        <div className="booking-item">
-          <CalendarDays />
-          <span>
-            <b>Check in</b>
-            <small>Add dates</small>
-          </span>
-        </div>
-        <div className="booking-item">
-          <CalendarDays />
-          <span>
-            <b>Check out</b>
-            <small>Add dates</small>
-          </span>
-        </div>
-        <div className="booking-item">
-          <Users />
-          <span>
-            <b>Travelers</b>
-            <small>Add guests</small>
-          </span>
-        </div>
-        <button onClick={() => setSearched(true)} className="search-button">
-          <Search size={15} /> Search
+        <label className="destination-search">
+          <Search size={16} />
+          <input placeholder="Search destinations..." />
+        </label>
+        <button className="filter-button">
+          Group by <ChevronRight size={13} />
+        </button>
+        <button className="filter-button">Filter</button>
+        <button className="filter-button">
+          Sort by <ChevronRight size={13} />
         </button>
         {searched && (
           <p className="search-message">
@@ -287,10 +267,15 @@ function App() {
             </div>
           </div>
         </div>
-        <div className="copyright">© 2025 GlobeTrotter. All rights reserved.</div>
+        <div className="copyright">
+          © 2025 GlobeTrotter. All rights reserved.
+        </div>
       </footer>
       <button className="chat" aria-label="Chat with us">
         <CircleUserRound />
+      </button>
+      <button className="plan-trip" onClick={() => setSearched(true)}>
+        +&nbsp; Plan a trip
       </button>
     </main>
   );
